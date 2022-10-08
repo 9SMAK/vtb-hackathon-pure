@@ -1,6 +1,7 @@
 import json
 
-import src.config as cfg
+
+from src import config as cfg
 import aiohttp
 
 from .schemas import *

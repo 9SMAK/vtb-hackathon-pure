@@ -17,6 +17,10 @@ services:
     environment:
       <<: *postgres_env
       POSTGRES_URL: $POSTGRES_URL
+      IPFS_URL: $IPFS_URL
+      SECRET_KEY: $SECRET_KEY
+      ALGORITHM: $ALGORITHM
+      ACCESS_TOKEN_EXPIRE_MINUTES: $ACCESS_TOKEN_EXPIRE_MINUTES
   ipfs:
     image: ipfs/go-ipfs:v0.7.0
     ports:
