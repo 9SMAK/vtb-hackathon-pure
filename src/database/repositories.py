@@ -1,63 +1,64 @@
 from contextlib import AbstractContextManager
-from typing import Callable, Iterator, List
+import logging
+from typing import Callable, Iterator
 
-from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy.sql.ddl import DropTable, CreateTable
 
-from .tables import User, Friends
+from .database import DATABASE
+from .tables import Friends, User
+from sqlalchemy.ext.asyncio import AsyncEngine
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 class UserRepository:
+    def __init__(self, engine: AsyncEngine, sessionmaker):
+        self._engine = engine
+        self._sessionmaker = sessionmaker
 
-    async def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
-        self.session_factory = session_factory
+    async def create_repository(self):
+        async with self._engine.begin() as conn:
+            await conn.execute(CreateTable(User.__table__, if_not_exists=True))
+            # await conn.run_sync(User.__table__.create())
 
-    async def create_table(self, engine):
-        User.__table__.create(engine)
-        
-    async def drop_table(self, engine):
-        User.__table__.drop(engine)
+    async def delete_repository(self):
+        async with self._engine.begin() as conn:
+            await conn.execute(DropTable(User.__table__, if_exists=True))
+            # await conn.run_sync(User.__table__.delete())
 
-    async def get_all(self) -> Iterator[User]:
-        with self.session_factory() as session:
-            return await session.query(User).all()
+    async def get_all(self):
+        async with self._sessionmaker() as session:
+            session: AsyncSession
+            # async with session.begin(): - this for massive selects?
+            statement = select(User)
+            result = await session.execute(statement)
+            return [user for user in result]
 
-    #def get_by_id(self, user_id: int) -> User:
-    #    with self.session_factory() as session:
-    #        user = session.query(User).filter(User.id == user_id).first()
-    #        if not user:
-    #            raise IdNotFoundError("User", user_id)
-    #        return user
-#
-    #def get_by_nick(self, user_nick: str) -> User:
-    #    with self.session_factory() as session:
-    #        user = session.query(User).filter(User.nick == user_nick).first()
-    #        if not user:
-    #            raise NameNotFoundError("User", user_nick)
-    #        return user
-#
-    #def add(
-    #    self, nick: str, desc: str = "", 
-    #    lvl: int = 1, exp: int = 0,
-    #    is_admin: bool = False, is_editor: bool = False,
-    #    is_teamlead: bool = False,
-    #    #equipment = Column(???),
-    #    visible_in_rating: bool = True, cases_count: int = 0,
-    #    #events = Column(???), minions: List[CutUser] = []
-    #) -> User:
-    #    with self.session_factory() as session:
-    #        user = User(
-    #            nick=nick, desc=desc, lvl=lvl, exp=exp,
-    #            is_admin=is_admin, is_editor=is_editor,
-    #            is_teamlead=is_teamlead, #equipment = Column(???),
-    #            visible_in_rating=visible_in_rating, cases_count=cases_count,
-    #            #events = Column(???), minions=minions
-    #        )
-    #            
-    #        session.add(user)
-    #        session.commit()
-    #        session.refresh(user)
-    #        return user
+    async def get_by_id(self, user_id: int) -> User:
+        async with self._sessionmaker() as session:
+            statement = select(User).filter(User.id == user_id)
+            user = (await session.execute(statement)).first()
+            if not user:
+                raise IdNotFoundError("User", user_id)
+            return user[0]
+
+    # TODO add check if already exists
+    async def add(self, **kwargs) -> User:
+        async with self._sessionmaker() as session:
+            try:
+                session: AsyncSession
+                user = User(**kwargs)
+                session.add(user)
+                await session.commit()
+                await session.refresh(user)
+            except IntegrityError:
+                await session.rollback()
 #
     #def delete_by_id(self, user_id: int) -> None:
     #    with self.session_factory() as session:
@@ -72,6 +73,9 @@ class UserRepository:
     #        friends = session.query(User).select_from(Friends).filter(Friends.user_from_id == user_id). \
     #            join(User, User.id == Friends.user_to_id).filter(Friends.is_friends == True).all()
     #        return friends
+
+
+USER = UserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
 
 
 class FriendsRepository:
@@ -141,9 +145,7 @@ class FriendsRepository:
             session.commit()
 
 
-
 class NotFoundError(Exception):
-
     entity_name: str
     search_pattern: str
 
@@ -157,6 +159,7 @@ class IdNotFoundError(NotFoundError):
         super().__init__(entity_id)
 
     search_pattern: str = "id"
+
 
 class NameNotFoundError(NotFoundError):
     def __init__(self, entity_name, entity_id):

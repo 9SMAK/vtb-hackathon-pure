@@ -2,7 +2,7 @@ import os
 
 from fastapi import FastAPI, APIRouter
 
-from src.api import user, blockchain
+from src.api import user, blockchain, admin
 from src.api.schemas import HomePageResponse, SqlReturn
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -18,6 +18,7 @@ app.add_middleware(
 api_router = APIRouter(prefix="/api", tags=["API"])
 api_router.include_router(user.router)
 api_router.include_router(blockchain.router)
+api_router.include_router(admin.router)
 app.include_router(api_router)
 
 
