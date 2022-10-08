@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres
+    environment: &postgres_env
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  server:
+    build: .
+    command: hypercorn --bind 0.0.0.0:8000 src.api.main:app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      <<: *postgres_env
+      POSTGRES_URL: $POSTGRES_URL
