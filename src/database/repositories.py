@@ -9,69 +9,69 @@ from .tables import User, Friends
 
 class UserRepository:
 
-    def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
+    async def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
         self.session_factory = session_factory
 
-    def create_table(self, engine):
+    async def create_table(self, engine):
         User.__table__.create(engine)
         
-    def drop_table(self, engine):
+    async def drop_table(self, engine):
         User.__table__.drop(engine)
 
-    def get_all(self) -> Iterator[User]:
+    async def get_all(self) -> Iterator[User]:
         with self.session_factory() as session:
-            return session.query(User).all()
+            return await session.query(User).all()
 
-    def get_by_id(self, user_id: int) -> User:
-        with self.session_factory() as session:
-            user = session.query(User).filter(User.id == user_id).first()
-            if not user:
-                raise IdNotFoundError("User", user_id)
-            return user
-
-    def get_by_nick(self, user_nick: str) -> User:
-        with self.session_factory() as session:
-            user = session.query(User).filter(User.nick == user_nick).first()
-            if not user:
-                raise NameNotFoundError("User", user_nick)
-            return user
-
-    def add(
-        self, nick: str, desc: str = "", 
-        lvl: int = 1, exp: int = 0,
-        is_admin: bool = False, is_editor: bool = False,
-        is_teamlead: bool = False,
-        #equipment = Column(???),
-        visible_in_rating: bool = True, cases_count: int = 0,
-        #events = Column(???), minions: List[CutUser] = []
-    ) -> User:
-        with self.session_factory() as session:
-            user = User(
-                nick=nick, desc=desc, lvl=lvl, exp=exp,
-                is_admin=is_admin, is_editor=is_editor,
-                is_teamlead=is_teamlead, #equipment = Column(???),
-                visible_in_rating=visible_in_rating, cases_count=cases_count,
-                #events = Column(???), minions=minions
-            )
-                
-            session.add(user)
-            session.commit()
-            session.refresh(user)
-            return user
-
-    def delete_by_id(self, user_id: int) -> None:
-        with self.session_factory() as session:
-            entity: User = session.query(User).filter(User.id == user_id).first()
-            if not entity:
-                raise IdNotFoundError("User", user_id)
-            session.delete(entity)
-            session.commit()
-
-    def get_user_friends(self, user_id) -> Iterator[User]:
-        with self.session_factory() as session:
-            friends = session.query(User).select_from(Friends).filter(Friends.user_from_id == user_id). \
-                join(User, User.id == Friends.user_to_id).filter(Friends.is_friends == True).all()
-            return friends
+    #def get_by_id(self, user_id: int) -> User:
+    #    with self.session_factory() as session:
+    #        user = session.query(User).filter(User.id == user_id).first()
+    #        if not user:
+    #            raise IdNotFoundError("User", user_id)
+    #        return user
+#
+    #def get_by_nick(self, user_nick: str) -> User:
+    #    with self.session_factory() as session:
+    #        user = session.query(User).filter(User.nick == user_nick).first()
+    #        if not user:
+    #            raise NameNotFoundError("User", user_nick)
+    #        return user
+#
+    #def add(
+    #    self, nick: str, desc: str = "", 
+    #    lvl: int = 1, exp: int = 0,
+    #    is_admin: bool = False, is_editor: bool = False,
+    #    is_teamlead: bool = False,
+    #    #equipment = Column(???),
+    #    visible_in_rating: bool = True, cases_count: int = 0,
+    #    #events = Column(???), minions: List[CutUser] = []
+    #) -> User:
+    #    with self.session_factory() as session:
+    #        user = User(
+    #            nick=nick, desc=desc, lvl=lvl, exp=exp,
+    #            is_admin=is_admin, is_editor=is_editor,
+    #            is_teamlead=is_teamlead, #equipment = Column(???),
+    #            visible_in_rating=visible_in_rating, cases_count=cases_count,
+    #            #events = Column(???), minions=minions
+    #        )
+    #            
+    #        session.add(user)
+    #        session.commit()
+    #        session.refresh(user)
+    #        return user
+#
+    #def delete_by_id(self, user_id: int) -> None:
+    #    with self.session_factory() as session:
+    #        entity: User = session.query(User).filter(User.id == user_id).first()
+    #        if not entity:
+    #            raise IdNotFoundError("User", user_id)
+    #        session.delete(entity)
+    #        session.commit()
+#
+    #def get_user_friends(self, user_id) -> Iterator[User]:
+    #    with self.session_factory() as session:
+    #        friends = session.query(User).select_from(Friends).filter(Friends.user_from_id == user_id). \
+    #            join(User, User.id == Friends.user_to_id).filter(Friends.is_friends == True).all()
+    #        return friends
 
 
 class FriendsRepository:
