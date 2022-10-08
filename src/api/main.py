@@ -1,14 +1,20 @@
 import os
 
 from fastapi import FastAPI, APIRouter
-from pydantic import BaseModel, HttpUrl
 
 from src.api import user
 from src.api.schemas import HomePageResponse, SqlReturn
 from src.database.client import PSQL_CLIENT
-import src.config as cfg
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 api_router = APIRouter(prefix="/api", tags=["API"])
 api_router.include_router(user.router)
