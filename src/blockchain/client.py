@@ -1,5 +1,6 @@
 import aiohttp
 
+from schemas import *
 from tenacity import retry, stop_after_attempt
 
 base_url = 'https://hackathon.lsp.team/hk'
@@ -22,23 +23,8 @@ async def create_account():
     """
         :return dict {"privateKey": "3243", "publicKey": "47655"}
     """
-    return await send_request('POST', base_url + '/v1/wallets/new')
-
-
-async def transfer_matic(_from: str, _to: str, _amount: float):
-    """
-        :param _from: user private key: str
-        :param _to: user public key: str
-        :param _amount: float
-        :return: tx_id string
-    """
-    resp = await send_request('POST', base_url + '/v1/transfers/matic',
-                              json={
-                                  "fromPrivateKey": _from,
-                                  "toPublicKey": _to,
-                                  "amount": _amount
-                              })
-    return resp['transaction']
+    info = await send_request('POST', base_url + '/v1/wallets/new')
+    return AccountInfo(privateKey=info["privateKey"], publicKey=info["publicKey"])
 
 
 async def transfer_coins(_from: str, _to: str, _amount: float):
@@ -54,7 +40,7 @@ async def transfer_coins(_from: str, _to: str, _amount: float):
                                   "toPublicKey": _to,
                                   "amount": _amount
                               })
-    return resp['transaction']
+    return TxHash(txId=resp['transaction'])
 
 
 async def transfer_nft(_from: str, _to: str, _id: int):
@@ -70,8 +56,7 @@ async def transfer_nft(_from: str, _to: str, _id: int):
                                   "toPublicKey": _to,
                                   "tokenId": _id
                               })
-    print(resp)
-    return resp['transaction_hash']
+    return TxHash(txId=resp['transaction_hash'])
 
 
 async def get_coin_balance(_pub_key: str, _token: str):
@@ -84,7 +69,7 @@ async def get_coin_balance(_pub_key: str, _token: str):
         pass
 
     resp = await send_request('GET', base_url + f'/v1/wallets/{_pub_key}/balance')
-    return resp[f'{_token}Amount']
+    return Balance(amount=resp[f'{_token}Amount'])
 
 
 async def get_nft_balance(_pub_key: str):
@@ -100,7 +85,7 @@ async def get_nft_balance(_pub_key: str):
         ]
     """
     resp = await send_request('GET', base_url + f'/v1/wallets/{_pub_key}/nft/balance')
-    return resp['balance']
+    return Inventory(items=[Item(uri=item['uri'], tokens=item['tokens']) for item in resp['balance']])
 
 
 async def generete_nft(_to: str, _uri: str, _count: int):
@@ -116,7 +101,7 @@ async def generete_nft(_to: str, _uri: str, _count: int):
                                   "uri": _uri,
                                   "nftCount": _count
                               })
-    return resp['transaction_hash']
+    return TxHash(txId=resp['transaction_hash'])
 
 
 async def get_tx_history(_user: str):
@@ -145,7 +130,15 @@ async def get_tx_history(_user: str):
                                   "offset": 20,
                                   "sort": "asc"
                               })
-    return resp['history']
+    return History(items=[
+        HistoryItem(
+            timeStamp=item['timeStamp'],
+            from_user=item['from'],
+            to_user=item['to'],
+            value=item['value'],
+            tokenName=item['tokenName'],
+            tokenSymbol=item['tokenSymbol'],
+        ) for item in resp['history']])
 
 
 async def get_nft_info(_id: str):
@@ -159,4 +152,9 @@ async def get_nft_info(_id: str):
             "publicKey": "0x15Cc4abzz27647ec9fE70D892E55586074263dF0"
         }
     """
-    return await send_request('GET', base_url + f'/v1/nft/{_id}')
+    info = await send_request('GET', base_url + f'/v1/nft/{_id}')
+    return NftInfo(
+        tokenId=info["tokenId"],
+        uri=info["uri"],
+        publicKey=info["publicKey"],
+    )

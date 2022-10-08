@@ -3,6 +3,7 @@ import json
 import config as cfg
 import aiohttp
 
+from schemas import *
 from tenacity import retry, stop_after_attempt
 
 
@@ -21,10 +22,20 @@ async def send_request(method: str, url: str, **kwargs) -> any:
 async def get_data(_id: str):
     """
         :return dict
+        {
+            "type": "shoes",
+            "name": "2",
+            "svg": "<>"
+        }
     """
     resp = await send_request('POST', cfg.IPFS_URL + f'/api/v0/get?arg={_id}&progress=true')
     string = await resp.text()
-    return json.loads(f'{{ {string.split("{")[1].split("}")[0]} }}')
+    item_info = json.loads(f'{{ {string.split("{")[1].split("}")[0]} }}')
+    return Item(
+        type=item_info["type"],
+        name=item_info["name"],
+        svg=item_info["svg"]
+    )
 
 #
 # async def main():
