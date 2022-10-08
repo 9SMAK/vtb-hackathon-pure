@@ -18,7 +18,7 @@ class SqlReturn(BaseModel):
 
 
 class ItemType(CamelStrEnum):
-    hat = auto()
+    hair = auto()
     head = auto()
     body = auto()
     bottom = auto()
