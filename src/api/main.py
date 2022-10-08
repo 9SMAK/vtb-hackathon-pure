@@ -2,9 +2,8 @@ import os
 
 from fastapi import FastAPI, APIRouter
 
-from src.api import user
+from src.api import user, blockchain
 from src.api.schemas import HomePageResponse, SqlReturn
-from src.database.client import PSQL_CLIENT
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -18,6 +17,7 @@ app.add_middleware(
 
 api_router = APIRouter(prefix="/api", tags=["API"])
 api_router.include_router(user.router)
+api_router.include_router(blockchain.router)
 app.include_router(api_router)
 
 

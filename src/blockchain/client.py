@@ -1,4 +1,3 @@
-import asyncio
 import aiohttp
 
 from tenacity import retry, stop_after_attempt

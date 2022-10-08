@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class BalanceResponse(BaseModel):
     user_id: int
     balance: float

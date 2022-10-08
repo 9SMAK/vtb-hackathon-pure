@@ -1,1 +1,1 @@
-from src.api.user.router import router
+from .router import router

@@ -13,3 +13,11 @@ async def base_clothes():
     )
 
     return response
+
+@router.post("/edit_description", response_model=BaseEquipmentResponse)
+async def base_clothes():
+    response = BaseEquipmentResponse(
+        equipment=get_base_clothes(),
+    )
+
+    return response

@@ -17,3 +17,13 @@ services:
     environment:
       <<: *postgres_env
       POSTGRES_URL: $POSTGRES_URL
+  ipfs:
+    image: ipfs/go-ipfs:v0.7.0
+    ports:
+      - "4001:4001"
+      - "4001:4001/udp"
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:5001:5001"
+    volumes:
+      - ./ipfs/data:/ipfs/data
+      - ./ipfs/export:/ipfs/export
