@@ -1,6 +1,6 @@
 import aiohttp
 
-from schemas import *
+from .schemas import *
 from tenacity import retry, stop_after_attempt
 
 base_url = 'https://hackathon.lsp.team/hk'
@@ -40,7 +40,7 @@ async def transfer_coins(_from: str, _to: str, _amount: float):
                                   "toPublicKey": _to,
                                   "amount": _amount
                               })
-    return TxHash(txId=resp['transaction'])
+    return resp['transaction']
 
 
 async def transfer_nft(_from: str, _to: str, _id: int):
@@ -56,7 +56,7 @@ async def transfer_nft(_from: str, _to: str, _id: int):
                                   "toPublicKey": _to,
                                   "tokenId": _id
                               })
-    return TxHash(txId=resp['transaction_hash'])
+    return resp['transaction_hash']
 
 
 async def get_coin_balance(_pub_key: str, _token: str):
@@ -69,7 +69,7 @@ async def get_coin_balance(_pub_key: str, _token: str):
         pass
 
     resp = await send_request('GET', base_url + f'/v1/wallets/{_pub_key}/balance')
-    return Balance(amount=resp[f'{_token}Amount'])
+    return resp[f'{_token}Amount']
 
 
 async def get_nft_balance(_pub_key: str):
@@ -101,7 +101,7 @@ async def generete_nft(_to: str, _uri: str, _count: int):
                                   "uri": _uri,
                                   "nftCount": _count
                               })
-    return TxHash(txId=resp['transaction_hash'])
+    return resp['transaction_hash']
 
 
 async def get_tx_history(_user: str):

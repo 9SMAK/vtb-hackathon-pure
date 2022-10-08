@@ -7,14 +7,6 @@ class AccountInfo(BaseModel):
     publicKey: str
 
 
-class TxHash(BaseModel):
-    txId: str
-
-
-class Balance(BaseModel):
-    amount: float
-
-
 class Item(BaseModel):
     uri: str
     tokens: list

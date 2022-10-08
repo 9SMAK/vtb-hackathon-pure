@@ -23,3 +23,7 @@ class ItemType(CamelStrEnum):
     body = auto()
     bottom = auto()
     shoes = auto()
+
+class ResponseStatus(CamelStrEnum):
+    ok = auto()
+    error = auto()

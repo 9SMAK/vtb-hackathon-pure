@@ -1,9 +1,9 @@
 import json
 
-import config as cfg
+import src.config as cfg
 import aiohttp
 
-from schemas import *
+from .schemas import *
 from tenacity import retry, stop_after_attempt
 
 
