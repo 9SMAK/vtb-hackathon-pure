@@ -3,7 +3,6 @@ import aiohttp
 
 from tenacity import retry, stop_after_attempt
 
-
 base_url = 'https://hackathon.lsp.team/hk'
 
 
@@ -121,20 +120,33 @@ async def generete_nft(_to: str, _uri: str, _count: int):
     return resp['transaction_hash']
 
 
-async def get_tx_history(_to: str, _uri: str, _count: int):
+async def get_tx_history(_user: str):
     """
-        :param _to: user public key: str
-        :param _uri: str
-        :param _count: int
-        :return: tx_id string
+        :param _user: user public key: str
+        :return: history list
+
+        [
+            {
+              "blockNumber": 0,
+              "timeStamp": 0,
+              "contractAddress": "string",
+              "from": "0x15Cc4abzz27647ec9fE70D892E55586074263dF0",
+              "to": "0x15Cc4abzz27647ec9fE70D892E55586074263dF0",
+              "value": 7777090721429512000,
+              "tokenName": "Wrapped Matic",
+              "tokenSymbol": "WMATIC",
+              "gasUsed": 120026,
+              "confirmations": 4920439
+            }
+        ]
     """
-    resp = await send_request('POST', base_url + '/v1/nft/generate',
+    resp = await send_request('POST', base_url + f'/v1/wallets/{_user}/history',
                               json={
-                                  "toPublicKey": _to,
-                                  "uri": _uri,
-                                  "nftCount": _count
+                                  "page": 1,
+                                  "offset": 20,
+                                  "sort": "asc"
                               })
-    return resp['transaction_hash']
+    return resp['history']
 
 
 async def get_nft_info(_id: str):
