@@ -31,7 +31,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     )
 
 
-@router.post("/register")
+@router.post("/registration")
 async def register(data: RegistrationData):
     user = await add_user(data.login, get_password_hash(data.password), data.name)
     if not user:
