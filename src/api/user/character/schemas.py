@@ -1,14 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Dict, List
 
 from src.api.schemas import ItemType
-
-
-class Item(BaseModel):
-    type: ItemType
-    ipfs_hash: str = Field(title="IPFS link for identification")
-    name: str = Field(max_length=100)
-    svg: str = Field(title="Image in .svg format")
+from src.api.user.schemas import Item
 
 
 class BaseEquipmentResponse(BaseModel):

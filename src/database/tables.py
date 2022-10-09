@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, Float, CheckConstraint
+from sqlalchemy import Boolean, Column, Integer, String, Float, CheckConstraint, PickleType
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Session, declarative_base
 
@@ -21,6 +21,7 @@ class User(Base):
     case_count = Column(Integer, default=3)  # TODO maybe remove
     public_key = Column(String)
     private_key = Column(String)
+    equipment = Column(PickleType, default={})
 
     __table_args__ = (CheckConstraint('case_count >= 0'),)
 

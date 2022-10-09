@@ -8,18 +8,21 @@ from src.ipfs.client import get_data
 from src import config as cfg
 from src.api.schemas import ResponseStatus
 from .schemas import BalanceResponse, TransferDRRequest, TransferDRResponse, TransferItemRequest, InventoryResponse
+from src.api.auth.authentication import authenticate_user, create_access_token, get_current_user, get_password_hash, \
+    AuthenticatedUser
+from .schemas import Item
 
 router = APIRouter(prefix="/blockchain", tags=["Blockchain"])
 
 
-def get_public_key(user_id: int):
-    public_admin_key = "0x9F6eEc850d46E10a053057D69a90290D011127B4"
-    return public_admin_key
+async def get_public_key(user_id: int):
+    user_info: User = await USER.get_by_id(user_id)
+    return user_info.public_key
 
 
-def get_private_key(user_id: int):
-    private_admin_key = cfg.PRIVATE_KEY
-    return private_admin_key
+async def get_private_key(current_user: AuthenticatedUser = Depends(get_current_user)):
+    user_info: User = await USER.get_by_id(current_user.id)
+    return user_info.private_key
 
 
 @router.get("/balance", response_model=BalanceResponse)
@@ -32,15 +35,15 @@ async def balance(user: AuthenticatedUser = Depends(get_current_user)):
 
 
 @router.post("/transfer/dr", response_model=TransferDRResponse)
-async def transfer_dr(data: TransferDRRequest):
-    if data.amount <= 0:
+async def transfer_dr(*, current_user: AuthenticatedUser = Depends(get_current_user), receiver_id: int, amount: float):
+    if amount <= 0:
         return TransferDRResponse(
             status=ResponseStatus.error,
             reason="Transfer amount should be positive number"
         )
 
-    balance = await get_coin_balance(get_public_key(data.sender_id), "coins")
-    if balance < data.amount:
+    balance = await get_coin_balance(get_public_key(current_user.id), "coins")
+    if balance < amount:
         return TransferDRResponse(
             status=ResponseStatus.error,
             reason="Not enough money on your wallet for transaction"
@@ -49,25 +52,25 @@ async def transfer_dr(data: TransferDRRequest):
     return TransferDRResponse(
         status=ResponseStatus.ok,
         tx_id=await transfer_coins(
-            get_private_key(data.sender_id), 
-            get_public_key(data.receiver_id),
-            data.amount)
+            get_private_key(current_user), 
+            get_public_key(receiver_id),
+            amount)
     )
 
 
 @router.post("/transfer/item", response_model=TransferDRResponse)
-async def transfer_item(data: TransferItemRequest):
-    if data.item_id < 0:
+async def transfer_item(*, current_user: AuthenticatedUser = Depends(get_current_user), receiver_id: int, item_id: int):
+    if item_id < 0:
         return TransferDRResponse(
             status=ResponseStatus.error,
             reason="Unexisting item"
         )
 
-    inventory = await get_nft_balance(get_public_key(data.sender_id))
+    inventory = await get_nft_balance(get_public_key(current_user.id))
 
     have_item = False
     for item in inventory.items:
-        if data.item_id in item.tokens:
+        if item_id in item.tokens:
             have_item = True
             break
     
@@ -80,18 +83,20 @@ async def transfer_item(data: TransferItemRequest):
     return TransferDRResponse(
         status=ResponseStatus.ok,
         tx_id=await transfer_nft(
-            get_private_key(data.sender_id), 
-            get_public_key(data.receiver_id),
-            data.item_id)
+            get_private_key(current_user), 
+            get_public_key(receiver_id),
+            item_id)
     )
 
 
 @router.get("/inventory", response_model=InventoryResponse)
-async def inventory(user_id: int):
+async def inventory(current_user: AuthenticatedUser = Depends(get_current_user)):
+    user_id = current_user.id
     inventory = await get_nft_balance(get_public_key(user_id))
 
     items = []
     for item in inventory.items:
-        items.append(await get_data(item.uri))
+        data = await get_data(item.uri)
+        items.append(Item(type=data.type, name=data.name, svg=data.svg, id=item.tokens[0]))
 
     return InventoryResponse(user_id=user_id, inventory=items)

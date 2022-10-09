@@ -8,8 +8,8 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from src import config as cfg
-from .fake_users import get_user_by_login, User
 from src.database.repositories import USER
+from src.database.schemas import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
