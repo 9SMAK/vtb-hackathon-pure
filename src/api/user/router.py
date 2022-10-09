@@ -9,6 +9,7 @@ from src.resources.parse_resources import get_random_item
 
 
 from .schemas import CutUser, UsersListResponce
+from ...blockchain.client import generete_nft
 
 router = APIRouter(prefix="/user")
 router.include_router(character.router)
@@ -24,8 +25,11 @@ async def claim_case(user_id: int):
 
     item_hash = get_random_item()
     item = await get_data(item_hash)
-    claimed_item = ClaimedItem(item_name=item.name, item_svg=item.svg, item_type=item.type)
 
+    user_public_key = await USER.get_by_id(user_id).public_key
+    await generete_nft(_to=user_public_key, _uri=item_hash, _count=1)
+
+    claimed_item = ClaimedItem(item_name=item.name, item_svg=item.svg, item_type=item.type)
     return ClaimCaseResponse(is_opened=is_opened,
                              claimed_item=claimed_item)
 
