@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel
 from sqlalchemy import select, delete, update
@@ -14,6 +14,8 @@ from .tables import Friends, User, Relationships
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.database import database
+from src.api.schemas import ItemType
+from src.api.user.schemas import Item
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -88,7 +90,7 @@ class UserRepository(Repository):
             return self._pydantic_convert_list(result)
 
     # TODO typings
-    async def decrease_case_cnt_safe(self, user_id):
+    async def decrease_case_cnt_safe(self, user_id: int):
         async with self._sessionmaker() as session:
             try:
                 statement = update(self._table).where(
@@ -101,7 +103,35 @@ class UserRepository(Repository):
             except IntegrityError:
                 await session.rollback()
                 return False
-           
+
+    async def change_description(self, user_id: int, description: str):
+        async with self._sessionmaker() as session:
+            try:
+                statement = update(self._table).where(
+                    self._table.id == user_id
+                ).values(description=description)
+                await session.execute(statement)
+                await session.commit()
+                await session.flush()
+                return True
+            except IntegrityError:
+                await session.rollback()
+                return False
+
+    async def change_equipment(self, user_id: int, equipment: Dict[ItemType, Item]):
+        async with self._sessionmaker() as session:
+            try:
+                statement = update(self._table).where(
+                    self._table.id == user_id
+                ).values(equipment=equipment)
+                await session.execute(statement)
+                await session.commit()
+                await session.flush()
+                return True
+            except IntegrityError:
+                await session.rollback()
+                return False
+
     async def get_incomming_requests(self, user_id) -> List[_pydantic_schema]:
         async with self._sessionmaker() as session:
             statement = select(User).select_from(Friends).filter(Friends.user_to_id == user_id). \

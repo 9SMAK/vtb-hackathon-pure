@@ -1,6 +1,7 @@
 import imp
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.admin.schemas import ClaimCaseResponse, ClaimedItem
 from src.api.user import character, friends
 from src.database.repositories import USER
@@ -8,7 +9,7 @@ from src.ipfs.client import get_data
 from src.resources.parse_resources import get_random_item
 
 
-from .schemas import CutUser, UsersListResponce
+from .schemas import CutUser, UsersListResponce, UserInfoResponse
 
 router = APIRouter(prefix="/user")
 router.include_router(character.router)
@@ -31,8 +32,20 @@ async def claim_case(user_id: int):
 
 
 @router.get("/info", tags=["User"])
-async def info():
-    return None
+async def info(user_id: int):
+    user_info = await USER.get_by_id(user_id)
+
+    return UserInfoResponse(**user_info.dict())
+
+
+# @router.post("/edit_description", response_model=)
+# async def edit_description(description: str):
+#     response = BaseEquipmentResponse(
+#         equipment=get_base_clothes(),
+#     )
+#
+#     return response
+
 
 
 @router.get("/workers", tags=["User"])

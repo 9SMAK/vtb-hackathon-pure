@@ -1,6 +1,9 @@
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel
+
+from src.api.schemas import ItemType
+from src.api.user.schemas import Item
 
 
 class User(BaseModel):
@@ -17,6 +20,7 @@ class User(BaseModel):
     case_count: int = 0
     public_key: str
     private_key: str
+    equipment: Dict[ItemType, Item] = {}
 
     class Config:
         orm_mode = True
