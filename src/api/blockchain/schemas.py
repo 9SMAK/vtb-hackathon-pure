@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Union, List
-from src.ipfs.schemas import Item as IPFS_Item
+from src.api.auth.authentication import get_current_user
 
 
 class BalanceResponse(BaseModel):
@@ -26,6 +26,13 @@ class TransferDRResponse(BaseModel):
     reason: Union[str, None] = None
 
 
+class Item(BaseModel):
+    type: str
+    name: str
+    svg: str
+    id: int
+
+
 class InventoryResponse(BaseModel):
     user_id: int
-    inventory: List[IPFS_Item]
+    inventory: List[Item]

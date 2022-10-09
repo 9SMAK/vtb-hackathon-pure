@@ -121,7 +121,7 @@ class UserRepository(Repository):
             statement = select(User).select_from(Relationships).filter(Relationships.lead == user_id). \
                 join(User, User.id == Relationships.worker)
             result = await session.execute(statement)
-            return self._pydantic_convert_list(result)
+            return self._pydantic_convert_list(result) 
 
 
 USER = UserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())

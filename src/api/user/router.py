@@ -1,5 +1,7 @@
 import imp
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from src.api.auth.authentication import get_current_user
+from src.api.auth.authentication import AuthenticatedUser
 
 from src.api.admin.schemas import ClaimCaseResponse, ClaimedItem
 from src.api.user import character, friends
@@ -29,14 +31,15 @@ async def claim_case(user_id: int):
     return ClaimCaseResponse(is_opened=is_opened,
                              claimed_item=claimed_item)
 
-
+                         
 @router.get("/info", tags=["User"])
-async def info():
-    return None
+async def info(current_user: AuthenticatedUser = Depends(get_current_user)):
+    return await USER.get_by_id(current_user.id)
 
 
 @router.get("/workers", tags=["User"])
-async def workers(user_id: int):
+async def workers(current_user: AuthenticatedUser = Depends(get_current_user)):
+    user_id = current_user.id
     workers_list = await USER.get_user_workers(user_id)
     workers = [CutUser(id=worker.id, login=worker.login) for worker in workers_list]
     return UsersListResponce(user_id=user_id, users=workers)

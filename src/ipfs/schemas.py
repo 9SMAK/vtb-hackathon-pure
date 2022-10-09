@@ -6,3 +6,4 @@ class Item(BaseModel):
     type: str
     name: str
     svg: str
+    id: int
