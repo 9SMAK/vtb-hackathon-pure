@@ -6,11 +6,11 @@ import random
 
 from src import config as cfg
 from src.api.schemas import ItemType
-from src.api.user.character.schemas import Item
+from src.api.user.schemas import Item
 from src.resources.cases import RARITY_TO_PROB
 
 
-async def get_base_clothes() -> Dict[ItemType, List[Item]]:
+def get_base_clothes() -> Dict[ItemType, List[Item]]:
     path = os.path.join(cfg.BASE_DIR, "resources", "data", "base_clothes.json")
     async with aiofiles.open(path, "r", encoding="utf-8") as fp:
         data = json.loads(await fp.read())
@@ -31,6 +31,9 @@ async def get_base_clothes() -> Dict[ItemType, List[Item]]:
             ))
 
     return result
+
+
+BASE_CLOTHES = get_base_clothes()
 
 
 def get_case_items():
