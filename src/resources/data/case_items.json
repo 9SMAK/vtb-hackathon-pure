@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "rarity": "common",
+      "ipfs_hash": "hash1"
+    },
+    {
+      "rarity": "rare",
+      "ipfs_hash": "hash2"
+    }
+  ]
+}

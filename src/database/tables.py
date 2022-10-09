@@ -1,7 +1,6 @@
-from sqlalchemy import Boolean, Column, Integer, String, Float
+from sqlalchemy import Boolean, Column, Integer, String, Float, CheckConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Session, declarative_base
-
 
 Base = declarative_base()
 
@@ -19,7 +18,9 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     is_editor = Column(Boolean, default=False)
     is_lead = Column(Boolean, default=False)
-    case_count = Column(Integer, default=0)
+    case_count = Column(Integer, default=1)  # TODO maybe remove
+
+    __table_args__ = (CheckConstraint('case_count >= 0'),)
 
     # equipment = Column(???)
     # visible_in_rating = Column(Boolean, default=True)

@@ -13,3 +13,14 @@ class CutUser(BaseModel):
 class UsersListResponce(BaseModel):
     user_id: int
     users: List[CutUser]
+
+
+class ClaimedItem(BaseModel):
+    item_name: str
+    item_svg: str
+    item_type: str
+
+
+class ClaimCaseResponse(BaseModel):
+    is_opened: bool
+    claimed_item: ClaimedItem = None
