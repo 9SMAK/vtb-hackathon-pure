@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src import config as cfg
-from .schemas import Token, User, RegistrationData, LoginResponse
+from .schemas import RegistrationData, LoginResponse
 from .fake_users import add_user
 from .authentication import authenticate_user, create_access_token, get_current_user, get_password_hash
 
@@ -39,13 +39,3 @@ async def registration(data: RegistrationData):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Login already in use",
         )
-
-
-@router.get("/users/me/", response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_user)):
-    return current_user
-
-
-@router.get("/users/me/items/")
-async def read_own_items(current_user: User = Depends(get_current_user)):
-    return [{"item_id": "Foo", "owner": current_user.username}]
