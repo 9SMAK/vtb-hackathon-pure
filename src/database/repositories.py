@@ -64,7 +64,7 @@ class Repository:
                 return False
 
     def _pydantic_convert_object(self, sqlalchemy_object):
-        return self._pydantic_schema.from_orm(sqlalchemy_object[0][self._table.__name__])
+        return self._pydantic_schema.from_orm(sqlalchemy_object[0])
 
     def _pydantic_convert_list(self, sqlalchemy_list):
         return [self._pydantic_schema.from_orm(x[self._table.__name__]) for x in sqlalchemy_list]
@@ -73,6 +73,12 @@ class Repository:
 class UserRepository(Repository):
     _table = User
     _pydantic_schema = schemas.User
+
+    async def get_by_login(self, login: str) -> _pydantic_schema:
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.login == login)
+            res = (await session.execute(statement)).first()
+            return self._pydantic_convert_object(res)
 
     async def get_user_friends(self, user_id) -> List[_pydantic_schema]:
         async with self._sessionmaker() as session:

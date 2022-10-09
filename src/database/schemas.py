@@ -15,6 +15,8 @@ class User(BaseModel):
     is_editor: bool = False
     is_lead: bool = False
     case_count: int = 0
+    public_key: str
+    private_key: str
 
     class Config:
         orm_mode = True

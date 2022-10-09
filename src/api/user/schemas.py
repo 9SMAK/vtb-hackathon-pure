@@ -24,6 +24,7 @@ class Achievement(BaseModel):
 class UserInfoResponse(BaseModel):
     id: int
     login: str
+    name: str
     description: str = Field(title="The description of the item", max_length=500)
     level: int
     experience: int

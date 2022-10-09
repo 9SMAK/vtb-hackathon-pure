@@ -1,7 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from src.resources.parse_resources import get_base_clothes
-from .schemas import BaseEquipmentResponse, Item, ItemType
+from .schemas import BaseEquipmentResponse, CreateCharacterResponse
+from src.api.auth.authentication import get_current_user, AuthenticatedUser
 
 router = APIRouter(prefix="/character", tags=["Character"])
 
@@ -13,6 +14,14 @@ async def base_clothes():
     )
 
     return response
+
+
+@router.get("/create_character", response_model=CreateCharacterResponse)
+async def create_character(user: AuthenticatedUser = Depends(get_current_user)):
+    return CreateCharacterResponse(
+        id=user.id,
+        success=True
+    )
 
 
 @router.post("/edit_description", response_model=BaseEquipmentResponse)

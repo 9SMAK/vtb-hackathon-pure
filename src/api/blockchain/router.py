@@ -1,5 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from src.api.auth.authentication import AuthenticatedUser, get_current_user
+from src.database.repositories import USER
+from src.database.schemas import User
 from src.blockchain.client import get_coin_balance, transfer_coins, get_nft_balance, transfer_nft
 from src.ipfs.client import get_data
 from src import config as cfg
@@ -20,10 +23,11 @@ def get_private_key(user_id: int):
 
 
 @router.get("/balance", response_model=BalanceResponse)
-async def balance(user_id: int):
+async def balance(user: AuthenticatedUser = Depends(get_current_user)):
+    user_info: User = await USER.get_by_id(user.id)
     return BalanceResponse(
-        user_id=user_id,
-        balance=await get_coin_balance(get_public_key(user_id), "coins"),
+        user_id=user.id,
+        balance=await get_coin_balance(user_info.public_key, "coins"),
     )
 
 

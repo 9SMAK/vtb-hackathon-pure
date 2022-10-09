@@ -5,9 +5,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from src import config as cfg
 from .schemas import RegistrationData, LoginResponse
-from .fake_users import add_user
 from .authentication import authenticate_user, create_access_token, get_current_user, get_password_hash, \
     AuthenticatedUser
+from src.database.repositories import USER
+from src.blockchain.client import create_account
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -35,7 +36,16 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.post("/registration")
 async def registration(data: RegistrationData):
-    user = await add_user(data.login, get_password_hash(data.password), data.name)
+    wallet = await create_account()
+
+    user = await USER.add(
+        login=data.login,
+        hashed_password=get_password_hash(data.password),
+        name=data.name,
+        public_key=wallet.publicKey,
+        private_key=wallet.privateKey,
+    )
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
