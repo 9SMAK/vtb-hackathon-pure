@@ -32,7 +32,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @router.post("/registration")
-async def register(data: RegistrationData):
+async def registration(data: RegistrationData):
     user = await add_user(data.login, get_password_hash(data.password), data.name)
     if not user:
         raise HTTPException(
