@@ -26,5 +26,3 @@ class UsersActionResponce(BaseModel):
     user_from_id: int
     user_to_id: int
     status: ResponseStatus
-
-
