@@ -73,3 +73,28 @@ async def drop_relationships():
 async def add_relationship(lead_id: int, worker_id: int):
     result = await RELATIONSHIPS.add(lead=lead_id, worker=worker_id)
     return OkResponse()
+
+
+@router.post("/hard_recreate_db")
+async def hard_recreate_db():
+    repos = [USER, FRIENDS, RELATIONSHIPS]
+    for repo in repos:
+        repo.delete_repository()
+        repo.create_repository()
+
+    await USER.add(login="masstermax", hashed_password="1", name="Max")
+    await USER.add(login="semen", hashed_password="2", name="Semen")
+    await USER.add(login="dan", hashed_password="3", name="Dan")
+    await USER.add(login="yar", hashed_password="4", name="Yar")
+    await USER.add(login="nik", hashed_password="5", name="Nik")
+
+    await FRIENDS.add(user_from_id=1, user_to_id=2, is_friends=False)
+    await FRIENDS.add(user_from_id=1, user_to_id=4, is_friends=True)
+    await FRIENDS.add(user_from_id=2, user_to_id=3, is_friends=True)
+    await FRIENDS.add(user_from_id=3, user_to_id=2, is_friends=True)
+    await FRIENDS.add(user_from_id=4, user_to_id=1, is_friends=True)
+
+    await RELATIONSHIPS.add(lead=1, worker=2)
+    await RELATIONSHIPS.add(lead=1, worker=3)
+    await RELATIONSHIPS.add(lead=1, worker=4)
+    await RELATIONSHIPS.add(lead=4, worker=5)

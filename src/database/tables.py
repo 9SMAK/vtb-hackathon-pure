@@ -18,7 +18,7 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     is_editor = Column(Boolean, default=False)
     is_lead = Column(Boolean, default=False)
-    case_count = Column(Integer, default=1)  # TODO maybe remove
+    case_count = Column(Integer, default=3)  # TODO maybe remove
 
     __table_args__ = (CheckConstraint('case_count >= 0'),)
 
