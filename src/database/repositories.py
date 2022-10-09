@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from pydantic import BaseModel
+from sqlalchemy import update
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -80,6 +81,21 @@ class UserRepository(Repository):
                 join(User, User.id == Friends.user_to_id).filter(Friends.is_friends == True)
             result = await session.execute(statement)
             return self._pydantic_convert_list(result)
+
+    # TODO typings
+    async def decrease_case_cnt_safe(self, user_id):
+        async with self._sessionmaker() as session:
+            try:
+                statement = update(self._table).where(
+                    self._table.id == user_id
+                ).values(case_count=self._table.case_count - 1)
+                await session.execute(statement)
+                await session.commit()
+                await session.flush()
+                return True
+            except IntegrityError:
+                await session.rollback()
+                return False
 
 
 USER = UserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
