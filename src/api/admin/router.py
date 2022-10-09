@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
 from src.api.schemas import OkResponse
-from src.database.repositories import USER, FRIENDS
-from .schemas import UsersListResponse, CutUser
+from src.database.repositories import USER, FRIENDS, RELATIONSHIPS
+from .schemas import UsersListResponce, CutUser
 from src.database.schemas import User
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -51,7 +51,25 @@ async def drop_friends():
     return OkResponse()
 
 
-@router.get("/get_all_friends")
-async def get_all_friends():
-    result = await FRIENDS.get_all()
+@router.get("/get_all_relationships")
+async def get_all_relationships():
+    result = await RELATIONSHIPS.get_all()
     return result
+
+
+@router.get("/create_relationships")
+async def create_relationships():
+    await RELATIONSHIPS.create_repository()
+    return OkResponse()
+
+
+@router.get("/drop_relationships")
+async def drop_relationships():
+    await RELATIONSHIPS.delete_repository()
+    return OkResponse()
+
+
+@router.get("/add_relationship")
+async def add_relationship(lead_id: int, worker_id: int):
+    result = await RELATIONSHIPS.add(lead=lead_id, worker=worker_id)
+    return OkResponse()

@@ -33,3 +33,13 @@ class UserInfoResponse(BaseModel):
     events: List[Event]
     friends: List[str]
     achievements: List[Achievement]
+
+
+class CutUser(BaseModel):
+    id: int
+    login: str
+
+
+class UsersListResponce(BaseModel):
+    user_id: int
+    users: List[CutUser]

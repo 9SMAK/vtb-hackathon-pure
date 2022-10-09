@@ -10,7 +10,7 @@ from sqlalchemy.sql.ddl import DropTable, CreateTable
 
 import src.database.schemas as schemas
 from .database import DATABASE
-from .tables import Friends, User
+from .tables import Friends, User, Relationships
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.database import database
@@ -95,6 +95,13 @@ class UserRepository(Repository):
             result = await session.execute(statement)
             return self._pydantic_convert_list(result)
 
+    async def get_user_workers(self, user_id) -> List[_pydantic_schema]:
+        async with self._sessionmaker() as session:
+            statement = select(User).select_from(Relationships).filter(Relationships.lead == user_id). \
+                join(User, User.id == Relationships.worker)
+            result = await session.execute(statement)
+            return self._pydantic_convert_list(result)
+
 
 USER = UserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
 
@@ -112,3 +119,11 @@ class FriendsRepository(Repository):
 
 
 FRIENDS = FriendsRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
+
+
+class RelationshipsRepository(Repository):
+    _table = Relationships
+    _pydantic_schema = schemas.Relationships
+
+
+RELATIONSHIPS = RelationshipsRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())

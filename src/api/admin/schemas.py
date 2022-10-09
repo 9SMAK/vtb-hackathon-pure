@@ -10,6 +10,6 @@ class CutUser(BaseModel):
     login: str
 
 
-class UsersListResponse(BaseModel):
+class UsersListResponce(BaseModel):
     user_id: int
     users: List[CutUser]
