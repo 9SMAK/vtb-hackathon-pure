@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String, Float
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Session, declarative_base
 
 
@@ -47,3 +48,63 @@ class Friends(Base):
                f"user_from_id={self.user_from_id}, " \
                f"user_to_id={self.user_to_id}, " \
                f"is_friends={self.is_friends})>"
+
+
+class Relationships(Base):
+    __tablename__ = "relationships"
+
+    id = Column(Integer, primary_key=True)
+    head = Column(Integer, index=True)
+    worker = Column(Integer, index=True)
+
+    def __repr__(self):
+        return f"<Relationships(id={self.id}, " \
+               f"head={self.head}, " \
+               f"worker={self.worker})>"
+
+
+class Achievements(Base):
+    __tablename__ = "achievements"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    description = Column(String, default="")
+    svg = Column(String)
+
+    def __repr__(self):
+        return f"<Achievements(id={self.id}, " \
+               f"name={self.name}, " \
+               f"description={self.description}, " \
+               f"svg={self.svg})>"
+
+
+class Merch(Base):
+    __tablename__ = "merch"
+
+    id = Column(Integer, primary_key=True)
+    description = Column(String)
+    image = Column(String)
+    price = Column(Float)
+
+    def __repr__(self):
+        return f"<Merch(id={self.id}, " \
+               f"description={self.description}, " \
+               f"image={self.image}, " \
+               f"price={self.price})>"
+
+
+class Events(Base):
+    __tablename__ = "events"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String, index=True)
+    description = Column(String)
+    type = Column(String)
+    members = Column(ARRAY(Integer))
+
+    def __repr__(self):
+        return f"<Events(id={self.id}, " \
+               f"title={self.title}, " \
+               f"description={self.description}, " \
+               f"type={self.type}, " \
+               f"members={self.members})>"
