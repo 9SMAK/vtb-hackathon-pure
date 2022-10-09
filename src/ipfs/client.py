@@ -11,13 +11,14 @@ from tenacity import retry, stop_after_attempt
 @retry(stop=stop_after_attempt(3))
 async def send_request(method: str, url: str, **kwargs) -> any:
     async with aiohttp.ClientSession() as session:
-        return await session.request(
+        async with session.request(
                 method=method,
                 url=url,
                 verify_ssl=False,
-                timeout=10,
+                timeout=15,
                 **kwargs
-        )
+        ) as response:
+            return await response.text()
 
 
 async def get_data(_id: str):
@@ -31,8 +32,7 @@ async def get_data(_id: str):
     """
     logging.info(cfg.IPFS_URL + f'/api/v0/get?arg={_id}&progress=true')
     resp = await send_request('POST', cfg.IPFS_URL + f'/api/v0/get?arg={_id}&progress=true')
-    string = await resp.text()
-    item_info = json.loads(f'{{ {string.split("{")[1].split("}")[0]} }}')
+    item_info = json.loads(f'{{ {resp.split("{")[1].split("}")[0]} }}')
     return Item(
         type=item_info["type"],
         name=item_info["name"],

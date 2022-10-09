@@ -23,9 +23,10 @@ router.include_router(friends_router.router)
 # TODO safe auth
 @router.post("/claim_case", response_model=ClaimCaseResponse)
 async def claim_case(user_id: int):
-    is_opened = await USER.decrease_case_cnt_safe(user_id)
-    if not is_opened:
-        return ClaimCaseResponse(is_opened=is_opened)
+    is_opened = True
+    # is_opened = await USER.decrease_case_cnt_safe(user_id)
+    # if not is_opened:
+    #     return ClaimCaseResponse(is_opened=is_opened)
 
     item_hash = get_random_item()
     item = await get_data(item_hash)
