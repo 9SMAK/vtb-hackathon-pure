@@ -92,7 +92,7 @@ async def transfer_item(*, current_user: AuthenticatedUser = Depends(get_current
 
 
 @router.get("/inventory", response_model=InventoryResponse)
-async def inventory(user_id):
+async def inventory(user_id: int):
     logging.info(f"{await get_public_key(user_id)}")
     inventory_list = await get_nft_balance(await get_public_key(user_id))
 
