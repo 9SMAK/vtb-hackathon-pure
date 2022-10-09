@@ -10,7 +10,9 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
-    nickname = Column(String, nullable=False, unique=True)
+    login = Column(String, nullable=False, unique=True)
+    hashed_password = Column(String, nullable=False)
+    name = Column(String, nullable=False)
     description = Column(String, default="")
     level = Column(Integer, default=1)
     experience = Column(Integer, default=0)
@@ -27,7 +29,8 @@ class User(Base):
     # SOME AUTH?
     def __repr__(self):
         return f"<User(id={self.id}, " \
-               f"nickname=\"{self.nickname}\", " \
+               f"name=\"{self.name}\", " \
+               f"login=\"{self.login}\", " \
                f"level=\"{self.level}\")>" \
             # f"lvl={self.lvl})>" \
         # f"exp=\"{self.nick}\", " \

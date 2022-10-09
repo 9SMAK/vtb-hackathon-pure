@@ -2,7 +2,8 @@ from fastapi import APIRouter
 
 from src.api.schemas import OkResponse
 from src.database.repositories import USER, FRIENDS
-from .schemas import UsersListResponce, User
+from .schemas import UsersListResponse, CutUser
+from src.database.schemas import User
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -20,16 +21,17 @@ async def drop_users():
 
 
 @router.get("/get_user_by_id")
-async def get_user_by_id(user_id: int):
+async def get_user_by_id(user_id: int) -> User:
     result = await USER.get_by_id(user_id=user_id)
     return result
 
 
 # TODO add restrictions
 @router.post("/add_user")
-async def add_user(nickname: str):
-    await USER.add(nickname=nickname)
-    return OkResponse()
+async def add_user(user: User):
+    res = await USER.add(user)
+    return res
+
 
 @router.get("/get_all_users")
 async def get_all_users():
@@ -42,11 +44,12 @@ async def get_user_by_id(user_id: int):
     result = await USER.get_by_id(user_id=user_id)
     return result
 
+
 @router.get("/get_user_friends")
-async def get_user_by_id(user_id: int):
+async def get_user_friends(user_id: int):
     friends_list = await USER.get_user_friends(user_id=user_id)
-    friends = [User(id=friend.User.id, nickname=friend.User.nickname) for friend in friends_list]
-    return UsersListResponce(user_id=user_id, users=friends)
+    friends = [CutUser(id=friend.id, login=friend.login) for friend in friends_list]
+    return UsersListResponse(user_id=user_id, users=friends)
 
 
 @router.get("/create_friends")
@@ -65,6 +68,7 @@ async def drop_friends():
 async def get_all_friends():
     result = await FRIENDS.get_all()
     return result
+
 
 # TODO add restrictions
 @router.post("/add_friends")

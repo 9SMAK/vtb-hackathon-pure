@@ -5,11 +5,11 @@ from typing import List
 from src.api.schemas import ItemType, ResponseStatus
 
 
-class User(BaseModel):
+class CutUser(BaseModel):
     id: int
-    nickname: str
+    login: str
 
 
-class UsersListResponce(BaseModel):
+class UsersListResponse(BaseModel):
     user_id: int
-    users: List[User]
+    users: List[CutUser]

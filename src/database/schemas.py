@@ -6,6 +6,8 @@ from pydantic import BaseModel
 class User(BaseModel):
     id: int
     login: str
+    hashed_password: str
+    name: str
     description: str = ""
     level: int = 1
     experience: int = 0
