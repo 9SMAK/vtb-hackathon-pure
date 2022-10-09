@@ -30,7 +30,7 @@ async def claim_case(user_id: int):
     item_hash = get_random_item()
     item = await get_data(item_hash)
 
-    user_public_key = await USER.get_by_id(user_id).public_key
+    user_public_key = (await USER.get_by_id(user_id)).public_key
     await generete_nft(_to=user_public_key, _uri=item_hash, _count=1)
 
     claimed_item = ClaimedItem(item_name=item.name, item_svg=item.svg, item_type=item.type)

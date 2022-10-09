@@ -15,7 +15,7 @@ async def send_request(method: str, url: str, **kwargs) -> any:
                 method=method,
                 url=url,
                 verify_ssl=False,
-                timeout=5,
+                timeout=10,
                 **kwargs
         )
 
