@@ -88,6 +88,6 @@ async def inventory(user_id: int):
 
     items = []
     for item in inventory.items:
-        items += [await get_data(id) for id in item.tokens]
+        items.append(await get_data(item.uri))
 
     return InventoryResponse(user_id=user_id, inventory=items)

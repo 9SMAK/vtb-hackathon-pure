@@ -1,3 +1,5 @@
+import asyncio
+
 import aiohttp
 
 from .schemas import *
@@ -158,3 +160,19 @@ async def get_nft_info(_id: str):
         uri=info["uri"],
         publicKey=info["publicKey"],
     )
+
+# async def main():
+#     # re = await get_nft_balance(
+#     #     _pub_key="0xdEE1415af0534B5EDa0995b8682BDB8a3d9498E5"
+#     # )
+#     # print(re)
+#
+#     re = await generete_nft(
+#         _to="0x9F6eEc850d46E10a053057D69a90290D011127B4",
+#         _uri="QmRqbVLHmapdyHpDHF2vJ5mRsbm6SX7Jt5PxvHSxS4UQWr",
+#         _count=1
+#     )
+#     print(re)
+#
+# if __name__ == '__main__':
+#     asyncio.run(main())
