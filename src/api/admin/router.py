@@ -20,6 +20,12 @@ async def drop_users():
     return OkResponse()
 
 
+@router.get("/get_all_users")
+async def get_all_users():
+    result = await USER.get_all()
+    return result
+
+
 @router.get("/get_user_by_id")
 async def get_user_by_id(user_id: int) -> User:
     result = await USER.get_by_id(user_id=user_id)
@@ -31,25 +37,6 @@ async def get_user_by_id(user_id: int) -> User:
 async def add_user(login: str, password: str, name: str):
     res = await USER.add(login=login, hashed_password=password, name=name)
     return res
-
-
-@router.get("/get_all_users")
-async def get_all_users():
-    result = await USER.get_all()
-    return result
-
-
-@router.get("/get_user_by_id")
-async def get_user_by_id(user_id: int):
-    result = await USER.get_by_id(user_id=user_id)
-    return result
-
-
-@router.get("/get_user_friends")
-async def get_user_friends(user_id: int):
-    friends_list = await USER.get_user_friends(user_id=user_id)
-    friends = [CutUser(id=friend.id, login=friend.login) for friend in friends_list]
-    return UsersListResponse(user_id=user_id, users=friends)
 
 
 @router.get("/create_friends")
@@ -68,10 +55,3 @@ async def drop_friends():
 async def get_all_friends():
     result = await FRIENDS.get_all()
     return result
-
-
-# TODO add restrictions
-@router.post("/add_friends")
-async def add_friends(user_from_id: int, user_to_id: int, is_friends: bool):
-    await FRIENDS.add(user_from_id=user_from_id, user_to_id=user_to_id, is_friends=is_friends)
-    return OkResponse()

@@ -12,16 +12,14 @@ class Item(BaseModel):
     svg: str = Field(title="Image in .svg format")
 
 
-class User(BaseModel):
+class CutUser(BaseModel):
     id: int
-    nick: str
-    name: str
-    equipment: List[Item]
+    login: str
 
 
 class UsersListResponce(BaseModel):
     user_id: int
-    users: List[User]
+    users: List[CutUser]
 
 
 class UsersActionResponce(BaseModel):
