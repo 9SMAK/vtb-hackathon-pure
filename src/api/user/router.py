@@ -39,8 +39,7 @@ async def claim_case(user_id: int):
 
                          
 @router.get("/info", tags=["User"])
-async def info(current_user: AuthenticatedUser = Depends(get_current_user)):
-    user_id = current_user.id
+async def info(user_id: int):
     user_info = await USER.get_by_id(user_id)
 
     return UserInfoResponse(**user_info.dict())
