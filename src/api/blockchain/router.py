@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends
 
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
@@ -90,12 +92,14 @@ async def transfer_item(*, current_user: AuthenticatedUser = Depends(get_current
 
 
 @router.get("/inventory", response_model=InventoryResponse)
-async def inventory(current_user: AuthenticatedUser = Depends(get_current_user)):
-    user_id = current_user.id
-    inventory = await get_nft_balance(await get_public_key(user_id))
+async def inventory(user_id):
+    logging.info(f"{await get_public_key(user_id)}")
+    inventory_list = await get_nft_balance(await get_public_key(user_id))
 
+    logging.info(f"{inventory_list}")
     items = []
-    for item in inventory.items:
+    for item in inventory_list.items:
+        logging.info(item.uri)
         data = await get_data(item.uri)
         items.append(Item(type=data.type, name=data.name, svg=data.svg, id=item.tokens[0]))
 

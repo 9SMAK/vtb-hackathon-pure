@@ -1,5 +1,5 @@
 import json
-
+import logging
 
 from src import config as cfg
 import aiohttp
@@ -29,6 +29,7 @@ async def get_data(_id: str):
             "svg": "<>"
         }
     """
+    logging.info(cfg.IPFS_URL + f'/api/v0/get?arg={_id}&progress=true')
     resp = await send_request('POST', cfg.IPFS_URL + f'/api/v0/get?arg={_id}&progress=true')
     string = await resp.text()
     item_info = json.loads(f'{{ {string.split("{")[1].split("}")[0]} }}')
