@@ -19,6 +19,8 @@ class User(Base):
     is_editor = Column(Boolean, default=False)
     is_lead = Column(Boolean, default=False)
     case_count = Column(Integer, default=3)  # TODO maybe remove
+    public_key = Column(String)
+    private_key = Column(String)
 
     __table_args__ = (CheckConstraint('case_count >= 0'),)
 

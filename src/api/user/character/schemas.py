@@ -13,3 +13,8 @@ class Item(BaseModel):
 
 class BaseEquipmentResponse(BaseModel):
     equipment: Dict[ItemType, List[Item]]
+
+
+class CreateCharacterResponse(BaseModel):
+    id: int
+    success: bool

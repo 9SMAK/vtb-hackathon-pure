@@ -31,5 +31,5 @@ services:
       - "127.0.0.1:8080:8080"
       - "127.0.0.1:5001:5001"
     volumes:
-      - ./ipfs/data:/ipfs/data
-      - ./ipfs/export:/ipfs/export
+      - ./ipfs/data:/data/ipfs
+      - ./ipfs/export:/export
