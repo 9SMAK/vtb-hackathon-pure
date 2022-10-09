@@ -42,7 +42,7 @@ async def transfer_dr(*, current_user: AuthenticatedUser = Depends(get_current_u
             reason="Transfer amount should be positive number"
         )
 
-    balance = await get_coin_balance(get_public_key(current_user.id), "coins")
+    balance = await get_coin_balance(await get_public_key(current_user.id), "coins")
     if balance < amount:
         return TransferDRResponse(
             status=ResponseStatus.error,
@@ -52,8 +52,8 @@ async def transfer_dr(*, current_user: AuthenticatedUser = Depends(get_current_u
     return TransferDRResponse(
         status=ResponseStatus.ok,
         tx_id=await transfer_coins(
-            get_private_key(current_user), 
-            get_public_key(receiver_id),
+            await get_private_key(current_user),
+            await get_public_key(receiver_id),
             amount)
     )
 
@@ -66,7 +66,7 @@ async def transfer_item(*, current_user: AuthenticatedUser = Depends(get_current
             reason="Unexisting item"
         )
 
-    inventory = await get_nft_balance(get_public_key(current_user.id))
+    inventory = await get_nft_balance(await get_public_key(current_user.id))
 
     have_item = False
     for item in inventory.items:
@@ -83,8 +83,8 @@ async def transfer_item(*, current_user: AuthenticatedUser = Depends(get_current
     return TransferDRResponse(
         status=ResponseStatus.ok,
         tx_id=await transfer_nft(
-            get_private_key(current_user), 
-            get_public_key(receiver_id),
+            await get_private_key(current_user),
+            await get_public_key(receiver_id),
             item_id)
     )
 
@@ -92,7 +92,7 @@ async def transfer_item(*, current_user: AuthenticatedUser = Depends(get_current
 @router.get("/inventory", response_model=InventoryResponse)
 async def inventory(current_user: AuthenticatedUser = Depends(get_current_user)):
     user_id = current_user.id
-    inventory = await get_nft_balance(get_public_key(user_id))
+    inventory = await get_nft_balance(await get_public_key(user_id))
 
     items = []
     for item in inventory.items:
