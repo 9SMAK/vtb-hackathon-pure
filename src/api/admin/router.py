@@ -4,6 +4,7 @@ from src.api.schemas import OkResponse
 from src.database.repositories import USER, FRIENDS, RELATIONSHIPS
 from .schemas import UsersListResponce, CutUser
 from src.database.schemas import User
+from ...blockchain.client import create_account
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -75,14 +76,17 @@ async def add_relationship(lead_id: int, worker_id: int):
     return OkResponse()
 
 
+# TODO maybe improve
 @router.post("/hard_recreate_db")
-async def hard_recreate_db():
+async def hard_recreate_db(should_create_wallet):
     repos = [USER, FRIENDS, RELATIONSHIPS]
     for repo in repos:
-        repo.delete_repository()
-        repo.create_repository()
+        await repo.delete_repository()
+        await repo.create_repository()
 
-    await USER.add(login="masstermax", hashed_password="1", name="Max")
+    wallet = await create_account()
+    await USER.add(login="masstermax", hashed_password="1", name="Max",
+                   public_key=wallet.publicKey, private_key=wallet.privateKey)
     await USER.add(login="semen", hashed_password="2", name="Semen")
     await USER.add(login="dan", hashed_password="3", name="Dan")
     await USER.add(login="yar", hashed_password="4", name="Yar")

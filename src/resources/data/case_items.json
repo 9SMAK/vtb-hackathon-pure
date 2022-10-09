@@ -2,11 +2,39 @@
   "items": [
     {
       "rarity": "common",
-      "ipfs_hash": "hash1"
+      "ipfs_hash": "QmRqbVLHmapdyHpDHF2vJ5mRsbm6SX7Jt5PxvHSxS4UQWr"
     },
     {
       "rarity": "rare",
-      "ipfs_hash": "hash2"
+      "ipfs_hash": "QmaNs9jKSwPzoc4YXFpNnrCJBnbxVCSvTpWFayK1bugMBQ"
+    },
+    {
+      "rarity": "rare",
+      "ipfs_hash": "QmPV2tS6Zp6XqXmga3vNvQQ17fDKXyS6VqquSz8sCH6CVj"
+    },
+    {
+      "rarity": "common",
+      "ipfs_hash": "QmTdjtkhYBjbW8cwiE4iMHqS1NeqEkptV3XXFYkyexNRYY"
+    },
+    {
+      "rarity": "common",
+      "ipfs_hash": "Qmct5d62WN4CT3QkkKtY3bTmbKGsgnXAaWrC7CcRpgYg11"
+    },
+        {
+      "rarity": "common",
+      "ipfs_hash": "Qmd7rCoVtnwBxFRQvnC7Uhzt6s89fCrCFc5SMHQnQLPza1"
+    },
+        {
+      "rarity": "common",
+      "ipfs_hash": "QmVyZhtLmC8eP1FeTpuR62p4msn3Ak6HqLFwjFN3UNFs1e"
+    },
+        {
+      "rarity": "common",
+      "ipfs_hash": "QmeJ2UiZckb9vFREfveEzVeRzrBgFNfrZFcdSH29y5djTC"
+    },
+    {
+      "rarity": "common",
+      "ipfs_hash": "QmXhTDWXXR5NUvUkBsYoWKNd2GMMmTMVeVQ3nbuHhnv35M"
     }
   ]
 }

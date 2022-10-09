@@ -23,14 +23,13 @@ async def claim_case(user_id: int):
         return ClaimCaseResponse(is_opened=is_opened)
 
     item_hash = get_random_item()
-    # item = await get_data(item_hash)
-    # claimed_item = ClaimedItem(item_name=item.name, item_svg=item.svg, item_type=item.type)
-    # TODO remove follow and uncomment above:
-    claimed_item = ClaimedItem(item_name=item_hash, item_svg="<tmp_svg>", item_type="<tmp_type>")
+    item = await get_data(item_hash)
+    claimed_item = ClaimedItem(item_name=item.name, item_svg=item.svg, item_type=item.type)
 
     return ClaimCaseResponse(is_opened=is_opened,
                              claimed_item=claimed_item)
-                         
+
+
 @router.get("/info", tags=["User"])
 async def info():
     return None
