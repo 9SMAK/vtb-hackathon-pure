@@ -10,7 +10,7 @@ router = APIRouter(prefix="/blockchain", tags=["Blockchain"])
 
 
 def get_public_key(user_id: int):
-    public_admin_key = "0xdEE1415af0534B5EDa0995b8682BDB8a3d9498E5"
+    public_admin_key = "0x9F6eEc850d46E10a053057D69a90290D011127B4"
     return public_admin_key
 
 
