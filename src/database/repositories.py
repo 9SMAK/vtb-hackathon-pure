@@ -50,11 +50,11 @@ class Repository:
             return self._pydantic_convert_object(res)
 
     # TODO add check if already exists
-    async def add(self, element: _pydantic_schema) -> bool:
+    async def add(self, **kwargs) -> bool:
         async with self._sessionmaker() as session:
             try:
                 session: AsyncSession
-                new_elem = self._table(**element.dict())
+                new_elem = self._table(**kwargs)
                 session.add(new_elem)
                 await session.commit()
                 await session.refresh(new_elem)

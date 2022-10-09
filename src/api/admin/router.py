@@ -28,8 +28,8 @@ async def get_user_by_id(user_id: int) -> User:
 
 # TODO add restrictions
 @router.post("/add_user")
-async def add_user(user: User):
-    res = await USER.add(user)
+async def add_user(login: str, password: str, name: str):
+    res = await USER.add(login=login, hashed_password=password, name=name)
     return res
 
 
