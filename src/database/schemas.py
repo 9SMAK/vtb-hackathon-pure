@@ -20,6 +20,16 @@ class User(BaseModel):
         orm_mode = True
 
 
+class Friends(BaseModel):
+    id: int
+    user_from_id: int
+    user_to_id: int
+    is_friends: bool
+
+    class Config:
+        orm_mode = True
+
+
 class Achievement(BaseModel):
     id: int
     name: str
@@ -46,6 +56,15 @@ class Event(BaseModel):
     description: str = ""
     type: str
     members: List[int] = []
+
+    class Config:
+        orm_mode = True
+
+
+class Relationships(BaseModel):
+    id: int
+    lead: int
+    worker: int
 
     class Config:
         orm_mode = True

@@ -1,3 +1,4 @@
+import imp
 from fastapi import APIRouter
 
 from src.api.admin.schemas import ClaimCaseResponse, ClaimedItem
@@ -6,7 +7,10 @@ from src.database.repositories import USER
 from src.ipfs.client import get_data
 from src.resources.parse_resources import get_random_item
 
-router = APIRouter(prefix="/user", tags=["User"])
+
+from .schemas import CutUser, UsersListResponce
+
+router = APIRouter(prefix="/user")
 router.include_router(character.router)
 router.include_router(friends.router)
 
@@ -26,3 +30,14 @@ async def claim_case(user_id: int):
 
     return ClaimCaseResponse(is_opened=is_opened,
                              claimed_item=claimed_item)
+                         
+@router.get("/info", tags=["User"])
+async def info():
+    return None
+
+
+@router.get("/workers", tags=["User"])
+async def workers(user_id: int):
+    workers_list = await USER.get_user_workers(user_id)
+    workers = [CutUser(id=worker.id, login=worker.login) for worker in workers_list]
+    return UsersListResponce(user_id=user_id, users=workers)

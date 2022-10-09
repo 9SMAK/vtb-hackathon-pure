@@ -5,12 +5,18 @@ from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from pydantic import BaseModel
 
 from src import config as cfg
 from .fake_users import get_user_by_login, User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
+
+
+class AuthenticatedUser(BaseModel):
+    id: int
+    login: str
 
 
 def verify_password(plain_password, hashed_password):
@@ -50,14 +56,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
     try:
         payload = jwt.decode(token, cfg.SECRET_KEY, algorithms=[cfg.ALGORITHM])
-        user_id: str = payload.get("user_id")
-        login: str = payload.get("login")
-        if user_id is None or login is None:
-            raise credentials_exception
+        verification_info = AuthenticatedUser(**payload)
     except JWTError:
         raise credentials_exception
 
-    user = await get_user_by_login(login)
+    user = await get_user_by_login(verification_info.login)
     if user is None:
         raise credentials_exception
     return user

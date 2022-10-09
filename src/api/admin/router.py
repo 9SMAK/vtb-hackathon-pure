@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
 from src.api.schemas import OkResponse
-from src.database.repositories import USER, FRIENDS
-from .schemas import UsersListResponse, CutUser
+from src.database.repositories import USER, FRIENDS, RELATIONSHIPS
+from .schemas import UsersListResponce, CutUser
 from src.database.schemas import User
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -20,6 +20,12 @@ async def drop_users():
     return OkResponse()
 
 
+@router.get("/get_all_users")
+async def get_all_users():
+    result = await USER.get_all()
+    return result
+
+
 @router.get("/get_user_by_id")
 async def get_user_by_id(user_id: int) -> User:
     result = await USER.get_by_id(user_id=user_id)
@@ -31,25 +37,6 @@ async def get_user_by_id(user_id: int) -> User:
 async def add_user(login: str, password: str, name: str):
     res = await USER.add(login=login, hashed_password=password, name=name)
     return res
-
-
-@router.get("/get_all_users")
-async def get_all_users():
-    result = await USER.get_all()
-    return result
-
-
-@router.get("/get_user_by_id")
-async def get_user_by_id(user_id: int):
-    result = await USER.get_by_id(user_id=user_id)
-    return result
-
-
-@router.get("/get_user_friends")
-async def get_user_friends(user_id: int):
-    friends_list = await USER.get_user_friends(user_id=user_id)
-    friends = [CutUser(id=friend.id, login=friend.login) for friend in friends_list]
-    return UsersListResponse(user_id=user_id, users=friends)
 
 
 @router.get("/create_friends")
@@ -64,14 +51,25 @@ async def drop_friends():
     return OkResponse()
 
 
-@router.get("/get_all_friends")
-async def get_all_friends():
-    result = await FRIENDS.get_all()
+@router.get("/get_all_relationships")
+async def get_all_relationships():
+    result = await RELATIONSHIPS.get_all()
     return result
 
 
-# TODO add restrictions
-@router.post("/add_friends")
-async def add_friends(user_from_id: int, user_to_id: int, is_friends: bool):
-    await FRIENDS.add(user_from_id=user_from_id, user_to_id=user_to_id, is_friends=is_friends)
+@router.get("/create_relationships")
+async def create_relationships():
+    await RELATIONSHIPS.create_repository()
+    return OkResponse()
+
+
+@router.get("/drop_relationships")
+async def drop_relationships():
+    await RELATIONSHIPS.delete_repository()
+    return OkResponse()
+
+
+@router.get("/add_relationship")
+async def add_relationship(lead_id: int, worker_id: int):
+    result = await RELATIONSHIPS.add(lead=lead_id, worker=worker_id)
     return OkResponse()

@@ -2,8 +2,7 @@ import logging
 from typing import List
 
 from pydantic import BaseModel
-from sqlalchemy import update
-from sqlalchemy import select
+from sqlalchemy import select, delete, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, declarative_base
@@ -11,7 +10,7 @@ from sqlalchemy.sql.ddl import DropTable, CreateTable
 
 import src.database.schemas as schemas
 from .database import DATABASE
-from .tables import Friends, User
+from .tables import Friends, User, Relationships
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.database import database
@@ -96,6 +95,27 @@ class UserRepository(Repository):
             except IntegrityError:
                 await session.rollback()
                 return False
+           
+    async def get_incomming_requests(self, user_id) -> List[_pydantic_schema]:
+        async with self._sessionmaker() as session:
+            statement = select(User).select_from(Friends).filter(Friends.user_to_id == user_id). \
+                join(User, User.id == Friends.user_from_id).filter(Friends.is_friends == False)
+            result = await session.execute(statement)
+            return self._pydantic_convert_list(result)
+
+    async def get_outcomming_requests(self, user_id) -> List[_pydantic_schema]:
+        async with self._sessionmaker() as session:
+            statement = select(User).select_from(Friends).filter(Friends.user_from_id == user_id). \
+                join(User, User.id == Friends.user_to_id).filter(Friends.is_friends == False)
+            result = await session.execute(statement)
+            return self._pydantic_convert_list(result)
+
+    async def get_user_workers(self, user_id) -> List[_pydantic_schema]:
+        async with self._sessionmaker() as session:
+            statement = select(User).select_from(Relationships).filter(Relationships.lead == user_id). \
+                join(User, User.id == Relationships.worker)
+            result = await session.execute(statement)
+            return self._pydantic_convert_list(result)
 
 
 USER = UserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
@@ -103,6 +123,22 @@ USER = UserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
 
 class FriendsRepository(Repository):
     _table = Friends
+    _pydantic_schema = schemas.Friends
+
+    async def remove_request(self, user_from_id, user_to_id):
+        async with self._sessionmaker() as session:
+            statement = delete(Friends).where(Friends.user_from_id == user_from_id, Friends.user_to_id == user_to_id)
+            await session.execute(statement)
+            await session.commit()
+            await session.flush()
 
 
 FRIENDS = FriendsRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
+
+
+class RelationshipsRepository(Repository):
+    _table = Relationships
+    _pydantic_schema = schemas.Relationships
+
+
+RELATIONSHIPS = RelationshipsRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
