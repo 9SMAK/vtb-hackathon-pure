@@ -54,17 +54,17 @@ class Relationships(Base):
     __tablename__ = "relationships"
 
     id = Column(Integer, primary_key=True)
-    head = Column(Integer, index=True)
+    lead = Column(Integer, index=True)
     worker = Column(Integer, index=True)
 
     def __repr__(self):
         return f"<Relationships(id={self.id}, " \
-               f"head={self.head}, " \
+               f"lead={self.lead}, " \
                f"worker={self.worker})>"
 
 
-class Achievements(Base):
-    __tablename__ = "achievements"
+class Achievement(Base):
+    __tablename__ = "achievement"
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -93,14 +93,14 @@ class Merch(Base):
                f"price={self.price})>"
 
 
-class Events(Base):
-    __tablename__ = "events"
+class Event(Base):
+    __tablename__ = "event"
 
     id = Column(Integer, primary_key=True)
     title = Column(String, index=True)
-    description = Column(String)
+    description = Column(String, default="")
     type = Column(String)
-    members = Column(ARRAY(Integer))
+    members = Column(ARRAY(Integer), default=[])
 
     def __repr__(self):
         return f"<Events(id={self.id}, " \
