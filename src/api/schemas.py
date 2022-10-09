@@ -18,11 +18,11 @@ class SqlReturn(BaseModel):
 
 
 class ItemType(CamelStrEnum):
-    # hair = auto()
+    hair = auto()
     head = auto()
     body = auto()
-    # bottom = auto()
-    # shoes = auto()
+    bottom = auto()
+    shoes = auto()
 
 
 class ResponseStatus(CamelStrEnum):
