@@ -9,7 +9,6 @@ from pydantic import BaseModel
 
 from src import config as cfg
 from src.database.repositories import USER
-from src.database.schemas import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
@@ -28,7 +27,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def authenticate_user(login, password) -> Optional[User]:
+async def authenticate_user(login, password):
     user = await USER.get_by_login(login)
     if not user:
         return None

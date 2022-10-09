@@ -1,13 +1,15 @@
 import os
 
 from fastapi import FastAPI, APIRouter, Depends
-from src.api.blockchain.router import get_public_key
 from src.api.blockchain.router import get_private_key
 from src.blockchain.client import transfer_coins
 from src.api.blockchain.schemas import TransferDRResponse
 import src.config as cfg
  
-from src.api import user, blockchain, admin, auth
+from src.api.user import router as user_router
+from src.api.auth import router as auth_router
+from src.api.admin import router as admin_router
+from src.api.blockchain import router as blockchain_router
 from src.api.schemas import HomePageResponse, ResponseStatus, SqlReturn
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.auth.authentication import authenticate_user, create_access_token, get_current_user, get_password_hash, \
@@ -23,10 +25,10 @@ app.add_middleware(
 )
 
 api_router = APIRouter(prefix="/api")
-api_router.include_router(user.router)
-api_router.include_router(blockchain.router)
-api_router.include_router(admin.router)
-api_router.include_router(auth.router)
+api_router.include_router(user_router.router)
+api_router.include_router(blockchain_router.router)
+api_router.include_router(admin_router.router)
+api_router.include_router(auth_router.router)
 app.include_router(api_router)
 
 

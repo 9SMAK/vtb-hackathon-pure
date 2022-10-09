@@ -5,7 +5,8 @@ from src.api.auth.authentication import AuthenticatedUser
 
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.admin.schemas import ClaimCaseResponse, ClaimedItem
-from src.api.user import character, friends
+from src.api.user.character import router as character_router
+from src.api.user.friends import router as friends_router
 from src.database.repositories import USER
 from src.ipfs.client import get_data
 from src.resources.parse_resources import get_random_item
@@ -14,8 +15,8 @@ from src.resources.parse_resources import get_random_item
 from .schemas import CutUser, UsersListResponce, UserInfoResponse
 
 router = APIRouter(prefix="/user")
-router.include_router(character.router)
-router.include_router(friends.router)
+router.include_router(character_router.router)
+router.include_router(friends_router.router)
 
 
 # TODO safe auth
